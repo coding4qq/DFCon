@@ -1,0 +1,3 @@
+1.0931847
+0.8141588
+python -u run.py --is_training 1 --AutoCon 1 --AutoCon_multiscales [28] --AutoCon_wnorm LastVal --AutoCon_lambda 1.0 --Auto_decomp mv --d_model 16 --d_ff 16 --e_layers 4 --target OT --root_path ./dataset/illness --data_path national_illness.csv --model_id ICLR24_CRV --model Auto1 --data national_illness --seq_len 14 --label_len 7 --pred_len 28 --enc_in 1 --c_out 7 --des Exp --itr 1 --batch_size 12 --learning_rate 0.005 --features S --train_epochs 10 --patience 3 --global_k 3 --local_k 3 --pos_k 3 --acf_k 3 --top_k_decomp 3 --top_k_multi [3] --alpha 0.5
