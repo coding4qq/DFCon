@@ -1,3 +1,0 @@
-0.79796207
-0.7131087
-python -u run.py --is_training 1 --AutoCon 1 --AutoCon_multiscales [96, 192, 336] --AutoCon_wnorm FFT --AutoCon_lambda 0.001 --Auto_decomp mv --d_model 16 --d_ff 16 --e_layers 2 --target OT --root_path ./dataset/electricity --data_path electricity.csv --model_id ICLR24_CRV --model FEDcon --data electricity --seq_len 336 --label_len 48 --pred_len 1440 --enc_in 1 --c_out 1 --des Exp --itr 1 --batch_size 64 --learning_rate 0.001 --features S --train_epochs 10 --patience 3 --global_k 25 --local_k 25 --pos_k 15 --acf_k 25 --top_k_decomp 25 --top_k_multi [5, 10, 15] --alpha 0.001

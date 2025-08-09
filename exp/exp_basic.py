@@ -1,38 +1,13 @@
 import os
 import torch
-from models import Autoformer, Transformer, TimesNet, Nonstationary_Transformer, DLinear, NLinear, FEDformer, \
-    Informer, LightTS, ETSformer, Pyraformer, PatchTST, MICN, Crossformer, FiLM, AutoConNet, AutoConCI, DeepTIMe, \
-    AutoConNet_v1, Minusformer, FEDformer_con, Autoformer_con, DFCon_SNR, iTransformer
+from models import DFCon
 
 
 class Exp_Basic(object):
     def __init__(self, args):
         self.args = args
         self.model_dict = {
-            'TimesNet': TimesNet,
-            'Autoformer': Autoformer,
-            'Transformer': Transformer,
-            'Nonstationary_Transformer': Nonstationary_Transformer,
-            'DLinear': DLinear,
-            'NLinear': NLinear,
-            'FEDformer': FEDformer,
-            'Informer': Informer,
-            'LightTS': LightTS,
-            'ETSformer': ETSformer,
-            'PatchTST': PatchTST,
-            'Pyraformer': Pyraformer,
-            'MICN': MICN,
-            'Crossformer': Crossformer,
-            'FiLM': FiLM,
-            'AutoConNet': AutoConNet,
-            'AutoConCI': AutoConCI,
-            'DeepTime': DeepTIMe,
-            'Auto1': AutoConNet_v1,
-            'Minus': Minusformer,
-            'FEDcon': FEDformer_con,
-            'Autofcon': Autoformer_con,
-            'DFCon_SNR':DFCon_SNR,
-            'iTransformer': iTransformer
+            'DFCon': DFCon,
         }
         self.device = self._acquire_device()
         self.model = self._build_model().to(self.device)

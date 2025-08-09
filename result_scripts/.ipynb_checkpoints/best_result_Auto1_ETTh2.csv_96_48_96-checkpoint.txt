@@ -1,3 +1,0 @@
-0.12431023
-0.26836026
-python -u run.py --is_training 1 --AutoCon 1 --AutoCon_multiscales [96] --AutoCon_wnorm LastVal --AutoCon_lambda 1.0 --Auto_decomp mv --d_model 16 --d_ff 16 --e_layers 3 --target OT --root_path ./dataset/ETT-small --data_path ETTh2.csv --model_id ICLR24_CRV --model Auto1 --data ETTh2 --seq_len 96 --label_len 48 --pred_len 96 --enc_in 1 --c_out 1 --des Exp --itr 1 --batch_size 64 --learning_rate 0.005 --features S --train_epochs 10 --patience 5 --global_k 45 --local_k 45 --pos_k 45 --acf_k 45 --top_k_decomp 3 --top_k_multi [5, 10, 15]

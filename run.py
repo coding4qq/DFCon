@@ -1,16 +1,10 @@
 import argparse
 import os
 import torch
-from exp.exp_long_term_forecasting import Exp_Long_Term_Forecast
-from exp.exp_long_term_forecasting_with_AutoCon import Exp_Long_Term_Forecast_with_AutoCon
-# from exp.exp_long_term_forecasting_with_FreCon_SNR import Exp_Long_Term_Forecast_with_FreLoss
-from exp.exp_long_term_forecasting_with_FreCon_explictNeg import Exp_Long_Term_Forecast_with_FreLoss
-# from exp.exp_long_term_forecasting_with_FreCon_short import Exp_Long_Term_Forecast_with_FreLoss
-
-# from exp.exp_long_term_forecasting_with_FreCon_14 import Exp_Long_Term_Forecast_with_FreLoss
 import random
 import numpy as np
 import scipy
+from exp.exp_long_term_forecasting_with_DFCon import Exp_Long_Term_Forecast_with_DFLoss
 
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -30,17 +24,17 @@ if __name__ == '__main__':
     torch.cuda.manual_seed(fix_seed)
     torch.cuda.manual_seed_all(fix_seed)
 
-    parser = argparse.ArgumentParser(description='AutoCon Argument Parser')
+    parser = argparse.ArgumentParser(description='DFCon Argument Parser')
 
-    # AutoCon config
-    parser.add_argument('--AutoCon', type=int, default=1, help='')
-    parser.add_argument('--AutoCon_wnorm', type=str, default='LastVal',
+    # DFCon config
+    parser.add_argument('--DFCon', type=int, default=1, help='')
+    parser.add_argument('--DFCon_wnorm', type=str, default='LastVal',
                         help='Window Normalization Techniques: {ReVIN | Mean | LastVal | Decomp}')
-    parser.add_argument('--Auto_decomp', type=str, default='mv',
-                        help='Automodel deocomp for long Techniques: {mv | fft}')
+    parser.add_argument('--DF_decomp', type=str, default='mv',
+                        help='DFConmodel deocomp for long Techniques: {mv | fft}')
 
-    parser.add_argument('--AutoCon_lambda', type=float, default=1.0, help='')
-    parser.add_argument('--AutoCon_multiscales', type=int, nargs='+', default=[96],
+    parser.add_argument('--DFCon_lambda', type=float, default=1.0, help='')
+    parser.add_argument('--DFCon_multiscales', type=int, nargs='+', default=[96],
                         help='e.g., [96, 192], [96, 192, 720]')
 
     parser.add_argument('--train_ratio', type=float, default=0.6, help='For custom dataset except for ETT datasets')
@@ -72,8 +66,8 @@ if __name__ == '__main__':
                         help='task name, options:[long_term_forecast, short_term_forecast, imputation, classification, anomaly_detection]')
     parser.add_argument('--is_training', type=int, default=1, help='status')
     parser.add_argument('--model_id', type=str, required=True, default='test', help='model id')
-    parser.add_argument('--model', type=str, required=True, default='AutoConNet',
-                        help='model name, options: [AutoConNet]')
+    parser.add_argument('--model', type=str, required=True, default='DFConNet',
+                        help='model name, options: [DFConNet]')
 
     # data loader
     parser.add_argument('--data', type=str, required=True, default='ETTm1', help='dataset type')
@@ -99,14 +93,14 @@ if __name__ == '__main__':
     parser.add_argument('--anomaly_ratio', type=float, default=0.25, help='prior anomaly ratio (%)')
 
     # model define
-    parser.add_argument('--top_k', type=int, default=5, help='for TimesBlock')
-    parser.add_argument('--global_k', type=int, default=5, help='for global loss of predict data')
-    parser.add_argument('--local_k', type=int, default=5, help='for local loss of  repr data')
-    parser.add_argument('--pos_k', type=int, default=3, help='for local loss of positive data')
+    # parser.add_argument('--decomp_top_k', type=int, default=5, help='for TimesBlock')
+    parser.add_argument('--AutoDFCon_k', type=int, default=5, help='for global loss of predict data')
+    parser.add_argument('--TempEnc_k', type=int, default=5, help='for local loss of  repr data')
+    parser.add_argument('--TempDF_k', type=int, default=3, help='for local loss of positive data')
     parser.add_argument('--acf_k', type=int, default=5, help='for global acf data')
     parser.add_argument('--top_k_decomp', type=int, default=5, help='for model decomp')
-    parser.add_argument('--top_k_multi', type=int, nargs='+', default=[5, 10, 15],
-                        help='e.g., [5, 10], [5, 10, 15], for model decomps')
+    # parser.add_argument('--top_k_multi', type=int, nargs='+', default=[5, 10, 15],
+    #                     help='e.g., [5, 10], [5, 10, 15], for model decomps')
 
     parser.add_argument('--num_kernels', type=int, default=6, help='for Inception')
     parser.add_argument('--enc_in', type=int, default=7, help='encoder input size')
@@ -166,20 +160,13 @@ if __name__ == '__main__':
     print('Args in experiment:')
     print(args)
 
-    if args.task_name == 'long_term_forecast':
-        if args.AutoCon:
-            # Exp = Exp_Long_Term_Forecast_with_AutoCon
-            Exp = Exp_Long_Term_Forecast_with_FreLoss
-        else:
-            Exp = Exp_Long_Term_Forecast
-    else:
-        raise Exception('Other tasks (e.g., Imputation, Classification) are available at TimesNet Repository')
+    Exp = Exp_Long_Term_Forecast_with_DFLoss
 
     if args.is_training:
         results = []
         for ii in range(args.itr):
             # setting record of experiments
-            setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_Autodecomp{}_Autownorm{}_gk{}_lk{}_acfk{}_kdecomp{}_kmulti{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(
+            setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_DFdecomp{}_DFownorm{}_adfk{}_tek{}_acfk{}_kdecomp{}_kmulti{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(
                 args.task_name,
                 args.model_id,
                 args.model,
@@ -189,10 +176,10 @@ if __name__ == '__main__':
                 args.label_len,
                 args.pred_len,
                 args.d_model,
-                args.Auto_decomp,
-                args.AutoCon_wnorm,
-                args.global_k,
-                args.local_k,
+                args.DF_decomp,
+                args.DFCon_wnorm,
+                args.AutoDFCon_k,
+                args.TempEnc_k,
                 args.acf_k,
                 args.top_k_decomp,
                 args.top_k_multi,
